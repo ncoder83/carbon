@@ -1,0 +1,56 @@
+﻿Instructions
+
+One of the critical functions that we provide for our clients is the ability to pay for their employees’ 
+benefits packages. A portion of these costs are deducted from their paycheck, 
+and we handle that deduction. Please demonstrate how you would code the following scenario:
+
+	 The cost of benefits is $1000/year for each employee
+	 Each dependent (children and possibly spouses) incurs a cost of $500/year
+	 Anyone whose name starts with ‘A’ gets a 10% discount, employee or dependent
+
+We’d like to see this calculation used in a web application where employers input employees and their dependents, and get a preview of the costs. This is of course a contrived example.
+We want to know how you would implement the application structure and calculations and get a brief preview of how you work.
+Please implement a web application based on these assumptions:
+	 All employees are paid $2000 per paycheck before deductions
+	 There are 26 paychecks in a year
+
+
+Database Design
+
+Employer
+	id, name, username, password, created_date, updated_date
+
+EmployerBenefit
+	id, employer_id, benefit_id, 
+	
+Benefit 
+	id, cost_per_year, cost_per_dependent, created_date, updated_date
+
+Discount
+	id, benefit, percent_discount, flat_discount, description, created_date, updated_date
+
+Employee
+	id, first_name, last_name, dob, username, password, start_date, end_date created_date, updated_date
+
+Account
+	id, employee_id, amount, created_date, updated_date
+
+AccountHistory
+	id, account_id, credit, debit, created_date, updated_date
+	
+Dependent
+	id, employee_id, first_name, last_name, created_date, updated_date
+	
+Role
+	id, name
+
+User
+	id, related_id, username, password, created_date, updated_date, 
+
+Who can do what
+
+Employer can add Employee information
+Employer can see a list of Employees (active, or inactive)
+Employer can add Employee Dependent information
+Employer can add Benefit information
+Employer can add Discount information
