@@ -10,6 +10,9 @@ namespace Carbon.Core.Models
         public int Id { get; set; }
 
         [Required]
+        public string Name { get; set; }
+
+        [Required]
         [Column(TypeName = "decimal(18,2)")]
         public decimal CostPerYear { get; set; }
 

@@ -1,19 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
 using Carbon.DataLayer.Context;
 using Carbon.Services;
+using Carbon.Services.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 namespace Carbon
 {
@@ -34,6 +28,7 @@ namespace Carbon
 
             //dependency injection
             services.AddScoped<IEmployeeService, EmployeeService>();
+            services.AddScoped<IBenefitService, BenefitService>();
 
             //connect our context to the carbon data
             services.AddDbContext<CarbonDbContext>(options =>

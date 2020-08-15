@@ -25,7 +25,7 @@ namespace Carbon.Services
             _mapper = mapper;
         }
 
-        public async Task<ServiceResponse<List<GetEmployeeDto>>> GetAll() 
+        public async Task<ServiceResponse<List<GetEmployeeDto>>> GetAll()
         {
             var response = new ServiceResponse<List<GetEmployeeDto>>();
             response.Data = emp.Select(e => _mapper.Map<GetEmployeeDto>(e)).ToList();
@@ -33,14 +33,20 @@ namespace Carbon.Services
         }
 
 
-        public async Task<ServiceResponse<GetEmployeeDto>> GetById(int id) 
+        public async Task<ServiceResponse<GetEmployeeDto>> GetById(int id)
         {
             var response = new ServiceResponse<GetEmployeeDto>();
-            response.Data = _mapper.Map<GetEmployeeDto>(emp.FirstOrDefault(e => e.Id == id));            
+            var item = _mapper.Map<GetEmployeeDto>(emp.FirstOrDefault(e => e.Id == id));
+
+            if (item == null)
+                response.Success = false;
+            else
+                response.Data = item;
+
             return response;
         }
 
-        public async Task<ServiceResponse<List<GetEmployeeDto>>> Add(AddEmployeeDto newEmployee) 
+        public async Task<ServiceResponse<List<GetEmployeeDto>>> Add(AddEmployeeDto newEmployee)
         {
             var response = new ServiceResponse<List<GetEmployeeDto>>();
             emp.Add(_mapper.Map<Employee>(newEmployee));
@@ -63,7 +69,7 @@ namespace Carbon.Services
 
                 response.Data = _mapper.Map<GetEmployeeDto>(updatedEmployee);
             }
-            catch(Exception ex) 
+            catch (Exception ex)
             {
                 response.Success = false;
                 response.Message = ex.Message;
@@ -80,7 +86,7 @@ namespace Carbon.Services
                 var employee = emp.First(e => e.Id == id);
                 emp.Remove(employee);
 
-               response.Data = emp.Select(e => _mapper.Map<GetEmployeeDto>(e)).ToList();
+                response.Data = emp.Select(e => _mapper.Map<GetEmployeeDto>(e)).ToList();
             }
             catch (Exception ex)
             {

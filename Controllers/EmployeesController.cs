@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Carbon.Core.Models;
+﻿using System.Threading.Tasks;
 using Carbon.Models.DTO;
 using Carbon.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -28,7 +26,12 @@ namespace Carbon.Site.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id) 
         {
-            return Ok(await _employeeService.GetById(id));
+            var response = await _employeeService.GetById(id);
+
+            if (response.Success)
+                return Ok(response);
+            else
+                return NotFound(response);
         }
 
 
@@ -40,15 +43,13 @@ namespace Carbon.Site.Controllers
 
 
         [HttpPut]
-        public async Task<IActionResult> UpdateEmployee(UpdateEmployeeDto newEmployee)
+        public async Task<IActionResult> UpdateEmployee(UpdateEmployeeDto updateEmployee)
         {
-            var response = await _employeeService.Update(newEmployee);
+            var response = await _employeeService.Update(updateEmployee);
 
-            if (response.Data == null)
-            {
+            if (response.Data == null)            
                 return NotFound(response);
-            }
-
+            
             return Ok(response);
         }
 

@@ -8,8 +8,13 @@ namespace Carbon
     {
         public AutoMapperProfile()
         {
+            //mapping profile for Employee
             CreateMap<Employee, GetEmployeeDto>();
             CreateMap<AddEmployeeDto, Employee>();
+
+            //mapping profile for Benefit
+            CreateMap<Benefit, GetBenefitDto>();
+            CreateMap<AddBenefitDto, Benefit>();
         }
     }
 }
