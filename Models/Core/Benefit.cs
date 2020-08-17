@@ -10,7 +10,7 @@ namespace Carbon.Core.Models
         public int Id { get; set; }
 
         [Required]
-        public string Name { get; set; }
+        public string Title { get; set; }
 
         [Required]
         [Column(TypeName = "decimal(18,2)")]
@@ -23,7 +23,7 @@ namespace Carbon.Core.Models
         [Required]
         public DateTime CreatedDate { get; set; }
 
-        public DateTime? UpdatedDate { get; set; }
+        public DateTime UpdatedDate { get; set; }
 
     }
 }

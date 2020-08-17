@@ -36,14 +36,14 @@ namespace Carbon.Site.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> AddEmployee(AddEmployeeDto newEmployee)
+        public async Task<IActionResult> AddEmployee([FromBody] AddEmployeeDto newEmployee)
         {
             return Ok(await _employeeService.Add(newEmployee));
         }
 
 
         [HttpPut]
-        public async Task<IActionResult> UpdateEmployee(UpdateEmployeeDto updateEmployee)
+        public async Task<IActionResult> UpdateEmployee([FromBody] UpdateEmployeeDto updateEmployee)
         {
             var response = await _employeeService.Update(updateEmployee);
 

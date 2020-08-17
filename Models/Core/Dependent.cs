@@ -19,6 +19,8 @@ namespace Carbon.Core.Models
         [Required]
         public string LastName { get; set; }
 
+        public string Relationship { get; set; }
+
         [Required]
         public DateTime CreatedDate { get; set; }
 
