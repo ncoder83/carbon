@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using Carbon.Core.Models;
+using Carbon.DataLayer.Context;
 using Carbon.Models;
 using Carbon.Models.DTO;
 using Carbon.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,16 +15,14 @@ namespace Carbon.Services
     public class BenefitService : IBenefitService
     {
 
-        private static List<Benefit> benefits = new List<Benefit> 
-        {
-            new Benefit{Id = 1, Title ="Simple Benefit", CostPerDependent = 500.00m, CostPerYear = 1000.00m, CreatedDate = DateTime.Now}
-        };
-
         private readonly IMapper _mapper;
 
-        public BenefitService(IMapper mapper)
+        private readonly CarbonDbContext _context;
+
+        public BenefitService(IMapper mapper, CarbonDbContext context)
         {
             _mapper = mapper;
+            _context = context;
         }
 
         public async Task<ServiceResponse<List<GetBenefitDto>>> Add(AddBenefitDto newBenefit)
@@ -31,10 +31,10 @@ namespace Carbon.Services
             try
             {
                 var converted = _mapper.Map<Benefit>(newBenefit);
-                converted.Id = benefits.Max(b => b.Id) + 1;
-                benefits.Add(converted);
-
-                response.Data = benefits.Select(b => _mapper.Map<GetBenefitDto>(b)).ToList();
+                
+                await _context.Benefits.AddAsync(converted);
+                await _context.SaveChangesAsync();
+                response.Data = _context.Benefits.Select(b => _mapper.Map<GetBenefitDto>(b)).ToList();
             }
             catch(Exception ex)
             {
@@ -49,10 +49,11 @@ namespace Carbon.Services
             var response = new ServiceResponse<List<GetBenefitDto>>();
             try
             {
-                var employee = benefits.First(e => e.Id == id);
-                benefits.Remove(employee);
-
-                response.Data = benefits.Select(e => _mapper.Map<GetBenefitDto>(e)).ToList();
+                var benefitToDelete = await _context.Benefits.FirstAsync(e => e.Id == id);
+                _context.Benefits.Remove(benefitToDelete);
+                await _context.SaveChangesAsync();
+                
+                response.Data = _context.Benefits.Select(e => _mapper.Map<GetBenefitDto>(e)).ToList();
             }
             catch (Exception ex)
             {
@@ -67,7 +68,8 @@ namespace Carbon.Services
             var response = new ServiceResponse<List<GetBenefitDto>>();
             try
             {
-                response.Data = benefits.Select(b => _mapper.Map<GetBenefitDto>(b)).ToList();
+                var allBenefits = await _context.Benefits.ToListAsync(); 
+                response.Data = allBenefits.Select(b => _mapper.Map<GetBenefitDto>(b)).ToList();
             }
             catch(Exception ex) 
             {
@@ -81,14 +83,15 @@ namespace Carbon.Services
         {
             var response = new ServiceResponse<GetBenefitDto>();
             try
-            {
-                var benefitFound = _mapper.Map<GetBenefitDto>(benefits.FirstOrDefault(b => b.Id == id));
+            {               
+                var benefitFound = await _context.Benefits.FirstOrDefaultAsync(b => b.Id == id);
 
                 if (benefitFound == null)
                     throw new Exception("Benefit not found");
 
-                response.Data = benefitFound;
-            }catch(Exception ex) 
+                response.Data = _mapper.Map<GetBenefitDto>(benefitFound);
+            }
+            catch(Exception ex) 
             {
                 response.Success = false;
                 response.Message = ex.Message;
@@ -102,11 +105,15 @@ namespace Carbon.Services
             var response = new ServiceResponse<GetBenefitDto>();
             try
             {
-                var updatedBenefit = benefits.FirstOrDefault(e => e.Id == updateBenefit.Id);
+                var updatedBenefit = await _context.Benefits.FirstOrDefaultAsync(e => e.Id == updateBenefit.Id);
+                
                 updatedBenefit.Title = updateBenefit.Title;
                 updatedBenefit.CostPerYear = updateBenefit.CostPerYear;
                 updatedBenefit.CostPerDependent = updateBenefit.CostPerDependent;
                 updateBenefit.UpdatedDate = DateTime.Now;
+
+                _context.Benefits.Update(updatedBenefit);
+                await _context.SaveChangesAsync();
                 
                 response.Data = _mapper.Map<GetBenefitDto>(updatedBenefit);
             }

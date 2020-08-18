@@ -14,7 +14,7 @@
         {
             var totalBenefit = benefitCost + (numberOfDependents * costPerDependents);
             var totalDiscount = totalBenefit * discount * 0.01m;
-            return totalBenefit - totalDiscount;
+            return totalBenefit - totalDiscount;  
         }
 
         public static decimal TotalDiscount(string name)

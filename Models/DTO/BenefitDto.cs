@@ -11,7 +11,6 @@ namespace Carbon.Models.DTO
         public string FormattedCostPerYear => CostPerYear.ToString("C", CultureInfo.CreateSpecificCulture("en-US"));
         public decimal CostPerDependent { get; set; }
         public string FormattedCostPerDependent => CostPerDependent.ToString("C", CultureInfo.CreateSpecificCulture("en-US"));
-
         public DateTime CreatedDate { get; set; }
         public string FormattedCreatedDate => CreatedDate.ToString("MMM dd yyyy");
         public DateTime UpdatedDate { get; set; } 

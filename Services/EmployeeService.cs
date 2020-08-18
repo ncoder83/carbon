@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
+using Carbon.Business;
 using Carbon.Core.Models;
+using Carbon.DataLayer.Context;
 using Carbon.Models;
 using Carbon.Models.DTO;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,24 +14,54 @@ namespace Carbon.Services
 {
     public class EmployeeService : IEmployeeService
     {
+
+        //Local store for now
         private static List<Employee> emp = new List<Employee>
         {
-            new Employee{Id = 1, FirstName ="Pascal", LastName = "Anglade",  StartDate = DateTime.Now.AddYears(-5), EndDate = DateTime.MaxValue },
-            new Employee{Id = 2, FirstName ="Thierry", LastName = "Anglade", StartDate = DateTime.Now.AddYears(-3), EndDate = DateTime.MaxValue  },
-            new Employee{Id = 3, FirstName ="Gaston", LastName = "Anglade" , StartDate = DateTime.Now.AddYears(-1), EndDate = DateTime.MaxValue },
-            new Employee{Id = 4, FirstName ="Suhans", LastName = "Anglade" , StartDate = DateTime.Now.AddYears(-2), EndDate = DateTime.MaxValue },
+            new Employee{Id = 1, FirstName ="Pascal", LastName = "Anglade",  StartDate = DateTime.Now.AddYears(-5), EndDate = DateTime.MaxValue, Account =  new Account
+            {
+                Id = 1,
+                Amount = 52000,
+                CreatedDate = DateTime.Now
+            }},
+            new Employee{Id = 2, FirstName ="Thierry", LastName = "Anglade", StartDate = DateTime.Now.AddYears(-3), EndDate = DateTime.MaxValue , Account =  new Account
+            {
+                Id = 1,
+                Amount = 52000,
+                CreatedDate = DateTime.Now
+            }},
+            new Employee{Id = 3, FirstName ="Gaston", LastName = "Anglade" , StartDate = DateTime.Now.AddYears(-1), EndDate = DateTime.MaxValue , Account =  new Account
+            {
+                Id = 1,
+                Amount = 52000,
+                CreatedDate = DateTime.Now
+            }},
+            new Employee{Id = 4, FirstName ="Suhans", LastName = "Anglade" , StartDate = DateTime.Now.AddYears(-2), EndDate = DateTime.MaxValue, Account =  new Account
+            {
+                Id = 1,
+                Amount = 52000,
+                CreatedDate = DateTime.Now
+            }},
         };
-        private readonly IMapper _mapper;
 
-        public EmployeeService(IMapper mapper)
+
+        private readonly IMapper _mapper;
+        private readonly CarbonDbContext _context;
+
+        public EmployeeService(IMapper mapper, CarbonDbContext context)
         {
             _mapper = mapper;
+            _context = context;
         }
 
         public async Task<ServiceResponse<List<GetEmployeeDto>>> GetAll()
         {
             var response = new ServiceResponse<List<GetEmployeeDto>>();
-            response.Data = emp.Select(e => _mapper.Map<GetEmployeeDto>(e)).ToList();
+            var dbEmployees = await _context.Employees.ToListAsync();
+
+            response.Data =  emp.Select(e => _mapper.Map<GetEmployeeDto>(e)).ToList();
+            //response.Data = dbEmployees.Select(e => _mapper.Map<GetEmployeeDto>(e)).ToList();
+
             return response;
         }
 
@@ -50,6 +83,18 @@ namespace Carbon.Services
         {
             var response = new ServiceResponse<List<GetEmployeeDto>>();
             var converted = _mapper.Map<Employee>(newEmployee);
+
+            var account = new Account
+            {
+                Id = 1,
+                Amount = Calculator.TotalPaidYearly(26, 2000),
+                CreatedDate = DateTime.Now
+            };
+
+            converted.Account = account;
+
+            
+
             converted.Id = emp.Max(e => e.Id) + 1;
             emp.Add(converted);
             response.Data = emp.Select(e => _mapper.Map<GetEmployeeDto>(e)).ToList();

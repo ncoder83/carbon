@@ -39,7 +39,8 @@ namespace Carbon.Models.DTO
         public DateTime DateOfBirth { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
-        public DateTime CreatedDate { get; set; }        
+        public DateTime CreatedDate { get; set; }
+        public int BenefitId { get; set; }
         public ICollection<Dependent> Dependents { get; set; } = new List<Dependent>();
     }
 

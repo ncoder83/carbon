@@ -10,35 +10,35 @@ namespace Carbon.Services.Interfaces
         /// <summary>
         /// This method will get all the benefits
         /// </summary>
-        /// <returns>return a list of employee</returns>
+        /// <returns>return a list of benefits</returns>
         Task<ServiceResponse<List<GetBenefitDto>>> GetAll();
 
         /// <summary>
         /// This method will get one benefit given the id
         /// </summary>
-        /// <param name="id">employe id to get</param>
-        /// <returns>return the employee found</returns>
+        /// <param name="id">benefit id to get</param>
+        /// <returns>return the benefit found</returns>
         Task<ServiceResponse<GetBenefitDto>> GetById(int id);
 
         /// <summary>
-        /// This method will add a new employee
+        /// This method will add a new benefit
         /// </summary>
-        /// <param name="newEmployee">new employee data to add</param>
-        /// <returns>retur a list with the new employee added</returns>
+        /// <param name="newBenefit">new benefit data to add</param>
+        /// <returns>return a list with the new benefit added</returns>
         Task<ServiceResponse<List<GetBenefitDto>>> Add(AddBenefitDto newBenefit);
 
         /// <summary>
         /// This method will update the benefit information
         /// </summary>
-        /// <param name="employee"></param>
+        /// <param name="updateBenefit"></param>
         /// <returns></returns>
         Task<ServiceResponse<GetBenefitDto>> Update(UpdateBenefitDto updateBenefit);
 
         /// <summary>
-        /// 
+        /// This method will rmove the benefit given the id
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="id">id of the benefit to delete</param>
+        /// <returns>returns a list with the benefit removed removed</returns>
         Task<ServiceResponse<List<GetBenefitDto>>> Delete(int id);
     }
 }

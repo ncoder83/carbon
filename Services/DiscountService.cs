@@ -1,12 +1,13 @@
 ﻿using AutoMapper;
 using Carbon.Core.Models;
+using Carbon.DataLayer.Context;
 using Carbon.Models;
 using Carbon.Models.DTO;
 using Carbon.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace Carbon.Services
@@ -20,34 +21,103 @@ namespace Carbon.Services
 
 
         private readonly IMapper _mapper;
-        public DiscountService(IMapper mapper)
+        private readonly CarbonDbContext _context;
+        public DiscountService(IMapper mapper, CarbonDbContext context)
         {
             _mapper = mapper;
+            _context = context;
         }
 
-        public Task<ServiceResponse<List<GetDiscountDto>>> Add(AddDiscountDto newBenefit)
+        public async Task<ServiceResponse<List<GetDiscountDto>>> Add(AddDiscountDto newDiscount)
         {
-            throw new NotImplementedException();
+            var response = new ServiceResponse<List<GetDiscountDto>>();
+            try
+            {
+                await _context.Discounts.AddAsync(_mapper.Map<Discount>(newDiscount));
+                await _context.SaveChangesAsync();
+                response.Data = _context.Discounts.Select(d => _mapper.Map<GetDiscountDto>(d)).ToList();
+            }
+            catch(Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+            }
+            return response;
         }
 
-        public Task<ServiceResponse<List<GetDiscountDto>>> Delete(int id)
+        public async Task<ServiceResponse<List<GetDiscountDto>>> Delete(int id)
         {
-            throw new NotImplementedException();
+            var response = new ServiceResponse<List<GetDiscountDto>>();
+            try
+            {
+                var discountToDelete = await _context.Discounts.FirstAsync(d => d.Id == id);
+                _context.Discounts.Remove(discountToDelete);
+                await _context.SaveChangesAsync();
+
+                response.Data = _context.Discounts.Select(d => _mapper.Map<GetDiscountDto>(d)).ToList();
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;                
+            }
+
+            return response;
         }
 
-        public Task<ServiceResponse<List<GetDiscountDto>>> GetAll()
+        public async Task<ServiceResponse<List<GetDiscountDto>>> GetAll()
         {
-            throw new NotImplementedException();
+            var response = new ServiceResponse<List<GetDiscountDto>>();
+            try
+            {
+                var allDiscounts = await _context.Discounts.ToListAsync();
+                response.Data = allDiscounts.Select(d => _mapper.Map<GetDiscountDto>(d)).ToList();
+            }
+            catch(Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+            }
+
+            return response;
         }
 
-        public Task<ServiceResponse<GetDiscountDto>> GetById(int id)
+        public async Task<ServiceResponse<GetDiscountDto>> GetById(int id)
         {
-            throw new NotImplementedException();
+            var response = new ServiceResponse<GetDiscountDto>();
+
+            try
+            {
+                var discountFound = await _context.Discounts.FirstOrDefaultAsync(d => d.Id == id);
+
+                if (discountFound == null)
+                    throw new Exception("Discount information not found");
+
+                response.Data = _mapper.Map<GetDiscountDto>(discountFound);
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;                
+            }
+
+            return response;
         }
 
-        public Task<ServiceResponse<GetDiscountDto>> Update(UpdateDiscountDto updateBenefit)
+        public async Task<ServiceResponse<GetDiscountDto>> Update(UpdateDiscountDto updateBenefit)
         {
-            throw new NotImplementedException();
+            var response = new ServiceResponse<GetDiscountDto>();
+            try
+            {
+
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+            }
+
+            return response;
         }
     }
 }

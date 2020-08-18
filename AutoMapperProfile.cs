@@ -15,6 +15,9 @@ namespace Carbon
             //mapping profile for Benefit
             CreateMap<Benefit, GetBenefitDto>();
             CreateMap<AddBenefitDto, Benefit>();
+
+            //mapping profile for Account
+            CreateMap<Account, GetAccountDto>();            
         }
     }
 }

@@ -23,12 +23,13 @@ namespace Carbon
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson();
             services.AddAutoMapper(typeof(Startup));
 
             //dependency injection
             services.AddScoped<IEmployeeService, EmployeeService>();
             services.AddScoped<IBenefitService, BenefitService>();
+            services.AddScoped<IAccountService, AccountService>();
 
             //connect our context to the carbon data
             services.AddDbContext<CarbonDbContext>(options =>
@@ -39,10 +40,11 @@ namespace Carbon
             services.AddCors(options => 
             {
                 options.AddPolicy("AllowAll",
+                   
                     p => p.AllowAnyOrigin()
                           .AllowAnyHeader()
-                          .AllowAnyMethod()
-                          //.AllowCredentials()
+                          .AllowAnyMethod()                         
+                          .WithOrigins("http://localhost:8080", "https://vuestaticapp.z19.web.core.windows.net").Build()                  
                 );
             });
 

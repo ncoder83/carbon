@@ -36,14 +36,14 @@ namespace Carbon.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> AddBenefit(AddBenefitDto newBenefit)
+        public async Task<IActionResult> AddBenefit([FromBody]AddBenefitDto newBenefit)
         {
             return Ok(await _benefitService.Add(newBenefit));
         }
 
 
         [HttpPut]
-        public async Task<IActionResult> UpdateBenefit(UpdateBenefitDto updatedBenefit)
+        public async Task<IActionResult> UpdateBenefit([FromBody]UpdateBenefitDto updatedBenefit)
         {
             var response = await _benefitService.Update(updatedBenefit);
 
