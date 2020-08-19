@@ -25,5 +25,11 @@ namespace Carbon.DataLayer.Context
         public DbSet<Employee> Employees { get; set; }
         public DbSet<EmployeeBenefit> EmployeeBenefits { get; set; }
         public DbSet<Employer> Employers { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            
+
+        }
     }
 }

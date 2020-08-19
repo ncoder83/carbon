@@ -18,7 +18,9 @@ namespace Carbon.Core.Models
 
         public string Relationship { get; set; }
 
-        [Required]
+        public int EmployeeId { get; set; }
+        //public Employee Employee { get; set; }
+        
         public DateTime CreatedDate { get; set; }
 
         public DateTime? UpdatedDate { get; set; }

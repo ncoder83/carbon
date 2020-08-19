@@ -18,12 +18,13 @@ namespace Carbon.Models.DTO
         public decimal YearlySalary => Calculator.TotalPaidYearly(26, 2000);
         public string FormattedYearlySalary => YearlySalary.ToString("C", CultureInfo.CreateSpecificCulture("en-US"));
         public decimal TotalBenefitCost { get; set; }
+        public string FormattedBenefitCost => TotalBenefitCost.ToString("C", CultureInfo.CreateSpecificCulture("en-US"));
         public string FormattedStartDate => StartDate.ToString("MMM dd yyyy");
         public DateTime EndDate { get; set; } = DateTime.MaxValue;
         public string FormattedEndDate => EndDate.ToString("MMM dd yyyy");
         public DateTime CreatedDate { get; set; }
         public DateTime UpdatedDate { get; set; }
-        public ICollection<Dependent> Dependents { get; set; } = new List<Dependent>();
+        public ICollection<Dependent> Dependents { get; set; }
         public int TotalDependents => Dependents.Count;
         public bool IsActive => DateTime.Now >= StartDate && DateTime.Now < EndDate;
         public string FullName => FirstName + " " + MiddleName + " " + LastName;

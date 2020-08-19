@@ -82,11 +82,13 @@ namespace Carbon.Services
                 if (employeeFound == null)
                     throw new Exception("Employee not found");
 
-                var benefit = await _context.Benefits.FirstOrDefaultAsync(b => b.Id == employeeFound.Benefit.Id);
-
                 var converted = _mapper.Map<GetEmployeeDto>(employeeFound);
-
-                converted.TotalBenefitCost = Calculator.TotalFromBenefit(benefit.CostPerYear, benefit.CostPerDependent, converted.TotalDependents);
+                          
+                if (employeeFound.Benefit != null)
+                {
+                    var benefit = await _context.Benefits.FirstOrDefaultAsync(b => b.Id == employeeFound.Benefit.Id);
+                    converted.TotalBenefitCost = Calculator.TotalFromBenefit(benefit.CostPerYear, benefit.CostPerDependent, converted.TotalDependents);
+                }
 
                 response.Data = converted;
             }
@@ -115,8 +117,19 @@ namespace Carbon.Services
 
                 converted.Account = account;
 
-                foreach (var dependent in newEmployee.Dependents)                
-                    converted.Dependents.Add(dependent);
+                foreach (var dependent in newEmployee.Dependents)
+                {
+                    var newDependent = new Dependent 
+                    {
+                        FirstName = dependent.FirstName,
+                        MiddleName = dependent.MiddleName,
+                        LastName = dependent.LastName,
+                        Relationship = dependent.Relationship
+                    };
+                    await _context.Dependents.AddAsync(newDependent);
+
+                    converted.Dependents.Add(newDependent);
+                }
 
                 await _context.Employees.AddAsync(converted);
                 await _context.SaveChangesAsync();
