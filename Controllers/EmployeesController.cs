@@ -18,13 +18,13 @@ namespace Carbon.Site.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get() 
+        public async Task<IActionResult> Get()
         {
             return Ok(await _employeeService.GetAll());
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id) 
+        public async Task<IActionResult> GetById(int id)
         {
             var response = await _employeeService.GetById(id);
 
@@ -47,21 +47,19 @@ namespace Carbon.Site.Controllers
         {
             var response = await _employeeService.Update(updateEmployee);
 
-            if (response.Data == null)            
+            if (response.Data == null)
                 return NotFound(response);
-            
+
             return Ok(response);
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id) 
+        public async Task<IActionResult> Delete(int id)
         {
             var response = await _employeeService.Delete(id);
 
             if (response.Data == null)
-            {
                 return NotFound(response);
-            }
 
             return Ok(response);
         }

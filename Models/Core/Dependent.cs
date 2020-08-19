@@ -7,10 +7,7 @@ namespace Carbon.Core.Models
     {
         [Key]
         public int Id { get; set; }
-
-        [Required]
-        public Employee Employee { get; set; }
-
+     
         [Required]
         public string FirstName { get; set; }
 

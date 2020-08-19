@@ -19,7 +19,6 @@ namespace Carbon.Services
             new Discount{Id = 1, Description ="Anyone whose name starts with ‘A’ gets a 10% discount, employee or dependent", PercentDiscount = 10, CreatedDate = DateTime.Now}
         };
 
-
         private readonly IMapper _mapper;
         private readonly CarbonDbContext _context;
         public DiscountService(IMapper mapper, CarbonDbContext context)

@@ -1,4 +1,5 @@
-﻿using Carbon.Services.Interfaces;
+﻿using AutoMapper.Configuration.Annotations;
+using Carbon.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -19,6 +20,11 @@ namespace Carbon.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
+            var response = await _accountService.Get();
+
+            if (response.Data == null)
+                return NotFound(response);
+
             return Ok(await _accountService.Get());
         }               
     }

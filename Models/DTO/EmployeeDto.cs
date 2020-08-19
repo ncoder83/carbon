@@ -17,7 +17,7 @@ namespace Carbon.Models.DTO
         public DateTime StartDate { get; set; }
         public decimal YearlySalary => Calculator.TotalPaidYearly(26, 2000);
         public string FormattedYearlySalary => YearlySalary.ToString("C", CultureInfo.CreateSpecificCulture("en-US"));
-        public decimal TotalBenefitCost => 0.00m;
+        public decimal TotalBenefitCost { get; set; }
         public string FormattedStartDate => StartDate.ToString("MMM dd yyyy");
         public DateTime EndDate { get; set; } = DateTime.MaxValue;
         public string FormattedEndDate => EndDate.ToString("MMM dd yyyy");
@@ -44,8 +44,6 @@ namespace Carbon.Models.DTO
         public ICollection<Dependent> Dependents { get; set; } = new List<Dependent>();
     }
 
-   
-
     public class UpdateEmployeeDto
     {
         public int Id { get; set; }
@@ -60,6 +58,4 @@ namespace Carbon.Models.DTO
         public DateTime UpdatedDate { get; set; }
         public ICollection<Dependent> Dependents { get; set; } = new List<Dependent>();
     }
-
-
 }

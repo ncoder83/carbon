@@ -16,33 +16,33 @@ namespace Carbon.Services
     {
 
         //Local store for now
-        private static List<Employee> emp = new List<Employee>
-        {
-            new Employee{Id = 1, FirstName ="Pascal", LastName = "Anglade",  StartDate = DateTime.Now.AddYears(-5), EndDate = DateTime.MaxValue, Account =  new Account
-            {
-                Id = 1,
-                Amount = 52000,
-                CreatedDate = DateTime.Now
-            }},
-            new Employee{Id = 2, FirstName ="Thierry", LastName = "Anglade", StartDate = DateTime.Now.AddYears(-3), EndDate = DateTime.MaxValue , Account =  new Account
-            {
-                Id = 1,
-                Amount = 52000,
-                CreatedDate = DateTime.Now
-            }},
-            new Employee{Id = 3, FirstName ="Gaston", LastName = "Anglade" , StartDate = DateTime.Now.AddYears(-1), EndDate = DateTime.MaxValue , Account =  new Account
-            {
-                Id = 1,
-                Amount = 52000,
-                CreatedDate = DateTime.Now
-            }},
-            new Employee{Id = 4, FirstName ="Suhans", LastName = "Anglade" , StartDate = DateTime.Now.AddYears(-2), EndDate = DateTime.MaxValue, Account =  new Account
-            {
-                Id = 1,
-                Amount = 52000,
-                CreatedDate = DateTime.Now
-            }},
-        };
+        //private static List<Employee> emp = new List<Employee>
+        //{
+        //    new Employee{Id = 1, FirstName ="Pascal", LastName = "Anglade",  StartDate = DateTime.Now.AddYears(-5), EndDate = DateTime.MaxValue, Account =  new Account
+        //    {
+        //        Id = 1,
+        //        Amount = 52000,
+        //        CreatedDate = DateTime.Now
+        //    }},
+        //    new Employee{Id = 2, FirstName ="Thierry", LastName = "Anglade", StartDate = DateTime.Now.AddYears(-3), EndDate = DateTime.MaxValue , Account =  new Account
+        //    {
+        //        Id = 1,
+        //        Amount = 52000,
+        //        CreatedDate = DateTime.Now
+        //    }},
+        //    new Employee{Id = 3, FirstName ="Gaston", LastName = "Anglade" , StartDate = DateTime.Now.AddYears(-1), EndDate = DateTime.MaxValue , Account =  new Account
+        //    {
+        //        Id = 1,
+        //        Amount = 52000,
+        //        CreatedDate = DateTime.Now
+        //    }},
+        //    new Employee{Id = 4, FirstName ="Suhans", LastName = "Anglade" , StartDate = DateTime.Now.AddYears(-2), EndDate = DateTime.MaxValue, Account =  new Account
+        //    {
+        //        Id = 1,
+        //        Amount = 52000,
+        //        CreatedDate = DateTime.Now
+        //    }},
+        //};
 
 
         private readonly IMapper _mapper;
@@ -57,11 +57,17 @@ namespace Carbon.Services
         public async Task<ServiceResponse<List<GetEmployeeDto>>> GetAll()
         {
             var response = new ServiceResponse<List<GetEmployeeDto>>();
-            var dbEmployees = await _context.Employees.ToListAsync();
 
-            response.Data =  emp.Select(e => _mapper.Map<GetEmployeeDto>(e)).ToList();
-            //response.Data = dbEmployees.Select(e => _mapper.Map<GetEmployeeDto>(e)).ToList();
-
+            try
+            {
+                var allEmployees = await _context.Employees.ToListAsync();                
+                response.Data = allEmployees.Select(e => _mapper.Map<GetEmployeeDto>(e)).ToList();
+            }
+            catch(Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+            }
             return response;
         }
 
@@ -69,35 +75,59 @@ namespace Carbon.Services
         public async Task<ServiceResponse<GetEmployeeDto>> GetById(int id)
         {
             var response = new ServiceResponse<GetEmployeeDto>();
-            var item = _mapper.Map<GetEmployeeDto>(emp.FirstOrDefault(e => e.Id == id));
+            try
+            {
+                var employeeFound = await _context.Employees.FirstOrDefaultAsync(e => e.Id == id);                
 
-            if (item == null)
+                if (employeeFound == null)
+                    throw new Exception("Employee not found");
+
+                var benefit = await _context.Benefits.FirstOrDefaultAsync(b => b.Id == employeeFound.Benefit.Id);
+
+                var converted = _mapper.Map<GetEmployeeDto>(employeeFound);
+
+                converted.TotalBenefitCost = Calculator.TotalFromBenefit(benefit.CostPerYear, benefit.CostPerDependent, converted.TotalDependents);
+
+                response.Data = converted;
+            }
+            catch(Exception ex) 
+            {
                 response.Success = false;
-            else
-                response.Data = item;
-
+                response.Message = ex.Message;
+            }
             return response;
         }
 
         public async Task<ServiceResponse<List<GetEmployeeDto>>> Add(AddEmployeeDto newEmployee)
         {
             var response = new ServiceResponse<List<GetEmployeeDto>>();
-            var converted = _mapper.Map<Employee>(newEmployee);
-
-            var account = new Account
+            try
             {
-                Id = 1,
-                Amount = Calculator.TotalPaidYearly(26, 2000),
-                CreatedDate = DateTime.Now
-            };
+                var converted = _mapper.Map<Employee>(newEmployee);
 
-            converted.Account = account;
+                var account = new Account
+                {
+                    Amount = Calculator.TotalPaidYearly(26, 2000),
+                    CreatedDate = DateTime.Now
+                };
 
-            
+                await _context.Accounts.AddAsync(account);
 
-            converted.Id = emp.Max(e => e.Id) + 1;
-            emp.Add(converted);
-            response.Data = emp.Select(e => _mapper.Map<GetEmployeeDto>(e)).ToList();
+                converted.Account = account;
+
+                foreach (var dependent in newEmployee.Dependents)                
+                    converted.Dependents.Add(dependent);
+
+                await _context.Employees.AddAsync(converted);
+                await _context.SaveChangesAsync();
+
+                response.Data = _context.Employees.Select(e => _mapper.Map<GetEmployeeDto>(e)).ToList();
+            }
+            catch(Exception ex) 
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+            }
 
             return response;
         }
@@ -107,12 +137,20 @@ namespace Carbon.Services
             var response = new ServiceResponse<GetEmployeeDto>();
             try
             {
-                var updatedEmployee = emp.FirstOrDefault(e => e.Id == employee.Id);
+                var updatedEmployee = _context.Employees.FirstOrDefault(e => e.Id == employee.Id);
+
                 updatedEmployee.FirstName = employee.FirstName;
                 updatedEmployee.MiddleName = employee.MiddleName;
                 updatedEmployee.LastName = employee.LastName;
                 updatedEmployee.Username = employee.Username;
-                updatedEmployee.Password = employee.Password;
+                updatedEmployee.Password = employee.Password;                
+                updatedEmployee.DateOfBirth = employee.DateOfBirth;
+                updatedEmployee.StartDate = employee.StartDate;
+                updatedEmployee.UpdatedDate = DateTime.Now;
+                updatedEmployee.Dependents = employee.Dependents;
+
+                _context.Employees.Update(updatedEmployee);
+                await _context.SaveChangesAsync();
 
                 response.Data = _mapper.Map<GetEmployeeDto>(updatedEmployee);
             }
@@ -130,10 +168,15 @@ namespace Carbon.Services
             var response = new ServiceResponse<List<GetEmployeeDto>>();
             try
             {
-                var employee = emp.First(e => e.Id == id);
-                emp.Remove(employee);
+                var employee = await _context.Employees.FirstAsync(e => e.Id == id);
 
-                response.Data = emp.Select(e => _mapper.Map<GetEmployeeDto>(e)).ToList();
+                if(employee == null)
+                    throw new Exception("Employee not found");
+
+                _context.Employees.Remove(employee);
+                await _context.SaveChangesAsync();
+                
+                response.Data = _context.Employees.Select(e => _mapper.Map<GetEmployeeDto>(e)).ToList();
             }
             catch (Exception ex)
             {
@@ -142,8 +185,5 @@ namespace Carbon.Services
             }
             return response;
         }
-
-
-
     }
 }

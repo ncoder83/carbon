@@ -33,18 +33,18 @@ namespace Carbon
 
             //connect our context to the carbon data
             services.AddDbContext<CarbonDbContext>(options =>
-                        options.UseSqlServer(Configuration.GetConnectionString("CarbonDatabase"))
+                        options.UseSqlServer(Configuration.GetConnectionString("ProductionCarbonDatabase"))
             );
 
             //setup cors
-            services.AddCors(options => 
+            services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll",
-                   
+
                     p => p.AllowAnyOrigin()
                           .AllowAnyHeader()
-                          .AllowAnyMethod()                         
-                          .WithOrigins("http://localhost:8080", "https://vuestaticapp.z19.web.core.windows.net").Build()                  
+                          .AllowAnyMethod()
+                          .WithOrigins("http://localhost:8080", "https://vuestaticapp.z19.web.core.windows.net").Build()
                 );
             });
 
@@ -59,7 +59,7 @@ namespace Carbon
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseCors("AllowAll");
-            
+
             app.UseSwagger();
             app.UseSwaggerUI(s => s.SwaggerEndpoint("/swagger/v1/swagger.json", "API V1"));
 
