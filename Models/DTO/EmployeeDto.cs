@@ -23,6 +23,7 @@ namespace Carbon.Models.DTO
         public DateTime EndDate { get; set; } = DateTime.MaxValue;
         public string FormattedEndDate => EndDate.ToString("MMM dd yyyy");
         public DateTime CreatedDate { get; set; }
+        public string FormattedCreatedDate => CreatedDate.ToString("MMM dd yyyy");
         public DateTime UpdatedDate { get; set; }
         public ICollection<Dependent> Dependents { get; set; }
         public int TotalDependents => Dependents.Count;

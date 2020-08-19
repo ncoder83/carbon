@@ -60,7 +60,11 @@ namespace Carbon.Services
 
             try
             {
-                var allEmployees = await _context.Employees.ToListAsync();                
+                var allEmployees = await _context.Employees.ToListAsync();
+                allEmployees.ForEach( e => {
+                    var dependents = _context.Dependents.Where(d => d.EmployeeId == e.Id).ToList();
+                    e.Dependents = dependents;
+                });
                 response.Data = allEmployees.Select(e => _mapper.Map<GetEmployeeDto>(e)).ToList();
             }
             catch(Exception ex)
@@ -77,13 +81,20 @@ namespace Carbon.Services
             var response = new ServiceResponse<GetEmployeeDto>();
             try
             {
+                //get the employee information 
                 var employeeFound = await _context.Employees.FirstOrDefaultAsync(e => e.Id == id);                
-
+                
                 if (employeeFound == null)
                     throw new Exception("Employee not found");
 
+                
                 var converted = _mapper.Map<GetEmployeeDto>(employeeFound);
-                          
+
+                //add the dependents to our dto
+                var dependents = await _context.Dependents.Where(e => e.EmployeeId == id).ToListAsync();
+                converted.Dependents = dependents;
+
+                
                 if (employeeFound.Benefit != null)
                 {
                     var benefit = await _context.Benefits.FirstOrDefaultAsync(b => b.Id == employeeFound.Benefit.Id);

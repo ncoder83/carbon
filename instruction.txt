@@ -17,40 +17,53 @@ Please implement a web application based on these assumptions:
 
 Database Design
 
-Employer
-	id, name, username, password, created_date, updated_date
+	Employer
+		id, name, username, password, created_date, updated_date
 
-EmployerBenefit
-	id, employer_id, benefit_id, 
+	EmployerBenefit
+		id, employer_id, benefit_id, 
 	
-Benefit 
-	id, cost_per_year, cost_per_dependent, created_date, updated_date
+	Benefit 
+		id, cost_per_year, cost_per_dependent, created_date, updated_date
 
-Discount
-	id, benefit, percent_discount, flat_discount, description, created_date, updated_date
+	Discount
+		id, benefit, percent_discount, flat_discount, description, created_date, updated_date
 
-Employee
-	id, first_name, last_name, dob, username, password, start_date, end_date created_date, updated_date
+	Employee
+		id, first_name, last_name, dob, username, password, start_date, end_date created_date, updated_date
 
-Account
-	id, employee_id, amount, created_date, updated_date
+	Account
+		id, employee_id, amount, created_date, updated_date
 
-AccountHistory
-	id, account_id, credit, debit, created_date, updated_date
+	AccountHistory
+		id, account_id, credit, debit, created_date, updated_date
 	
-Dependent
-	id, employee_id, first_name, last_name, created_date, updated_date
+	Dependent
+		id, employee_id, first_name, last_name, created_date, updated_date
 	
-Role
-	id, name
+	Role
+		id, name
 
-User
-	id, related_id, username, password, created_date, updated_date, 
+	User
+		id, related_id, username, password, created_date, updated_date, 
+
 
 Who can do what
 
-Employer can add Employee information
-Employer can see a list of Employees (active, or inactive)
-Employer can add Employee Dependent information
-Employer can add Benefit information
-Employer can add Discount information
+	Employer can add Employee information
+	Employer can see a list of Employees (active, or inactive)	
+	Employer can see an employee detail
+	Employer can add Employee Dependent information
+	Employer can see a list of Benefits
+	Employer can see an benefit detail
+	Employer can add Benefit information
+	Employer can add Discount information
+
+what are going to do 
+	create a web api using asp.net core deployable to linux boxes
+	add swagger to api for manual testing and debugging
+	use efcore as an orm so we can use the fluent api, create migration
+	create a front end app using vue to interact with the api
+	deploy api to azure
+	deploy spa to azure
+
